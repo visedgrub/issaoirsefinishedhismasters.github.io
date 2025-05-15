@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saoirse's Masters Status</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font for a slightly nicer look, if desired */
+        body {
+            font-family: 'Inter', sans-serif; /* Inter is a common, clean font often used with Tailwind */
+        }
+        /* Adding a little extra style for the answer box */
+        #answerBox {
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+        /* Basic styling for the progress bar container */
+        #progressBarContainer {
+            width: 100%;
+            background-color: #e5e7eb; /* Tailwind gray-200/300 */
+            border-radius: 9999px; /* Tailwind rounded-full */
+            height: 1rem; /* Tailwind h-4 */
+            margin-top: 1.5rem; /* Tailwind mt-6 */
+            overflow: hidden; /* Ensures the filled bar stays rounded */
+        }
+        /* Basic styling for the filled part of the progress bar */
+        #progressBarFill {
+            height: 100%;
+            background-color: #3b82f6; /* Tailwind blue-600 */
+            border-radius: 9999px; /* Tailwind rounded-full */
+            width: 0%; /* Initial width, will be set by JS */
+            transition: width 0.5s ease-in-out; /* Smooth transition for updates */
+        }
+         #progressText {
+            text-align: center;
+            margin-top: 0.5rem; /* Tailwind mt-2 */
+            color: #4b5563; /* Tailwind gray-700 */
+            font-size: 0.875rem; /* Tailwind text-sm */
+         }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-r from-blue-500 to-purple-600 flex flex-col justify-center items-center min-h-screen p-6 text-white">
+
+    <div class="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg shadow-xl rounded-xl p-8 md:p-12 text-center max-w-md w-full">
+        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-gray-900">
+            Is Saoirse finished his masters?
+        </h1>
+
+        <div id="progressBarContainer">
+            <div id="progressBarFill"></div>
+        </div>
+        <div id="progressText" class="text-sm text-gray-700 mt-2"></div>
+
+
+        <button id="checkButton" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-3 px-8 rounded-lg text-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-yellow-300 mt-8">
+            Find Out!
+        </button>
+
+        <div id="answerBox" class="mt-10 p-6 rounded-lg text-2xl md:text-3xl font-bold min-h-[80px] flex justify-center items-center bg-gray-200 text-gray-800">
+            <span id="answerText">?</span>
+        </div>
+    </div>
+
+    <script>
+        // Get references to the button and the answer display area
+        const checkButton = document.getElementById('checkButton');
+        const answerTextElement = document.getElementById('answerText');
+        const answerBoxElement = document.getElementById('answerBox');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progressTextElement = document.getElementById('progressText');
+
+
+        // Define the start date (assuming a typical Masters start)
+        // JavaScript months are 0-indexed (0 for January, 8 for September)
+        const startDate = new Date(2023, 8, 1); // September 1st, 2023
+
+        // Define the target date: September 1st, 2025 (end date)
+        const targetDate = new Date(2025, 8, 1); // September 1st, 2025
+
+        // Calculate the total duration in milliseconds
+        const totalDuration = targetDate.getTime() - startDate.getTime();
+
+        // Function to update the progress bar
+        function updateProgressBar() {
+            const currentDate = new Date(); // Get the current date and time
+
+            // Calculate elapsed time in milliseconds
+            const elapsedTime = currentDate.getTime() - startDate.getTime();
+
+            // Calculate percentage
+            let percentage = (elapsedTime / totalDuration) * 100;
+
+            // Clamp percentage between 0 and 100
+            percentage = Math.max(0, Math.min(100, percentage));
+
+            // Update the width of the progress bar fill element
+            progressBarFill.style.width = percentage + '%';
+
+            // Update the percentage text
+            progressTextElement.textContent = percentage.toFixed(2) + '% Complete';
+
+            // If the target date is reached or passed, update the progress bar to 100% and text
+             if (currentDate >= targetDate) {
+                progressBarFill.style.width = '100%';
+                progressTextElement.textContent = '100% Complete';
+             }
+        }
+
+
+        // Function to check the date and display the answer
+        function checkMastersStatus() {
+            const currentDate = new Date(); // Get the current date and time
+
+            // Normalize current date to midnight to compare with targetDate (which is implicitly midnight)
+            const currentDayOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+
+            let answer = "";
+            let answerBoxBgColor = "";
+            let answerTextColor = "";
+
+            if (currentDayOnly >= targetDate) {
+                answer = "Yes!";
+                answerBoxBgColor = "bg-green-500"; // Green background for "Yes"
+                answerTextColor = "text-white";
+            } else {
+                answer = "No.";
+                answerBoxBgColor = "bg-red-500";   // Red background for "No"
+                answerTextColor = "text-white";
+            }
+
+            // Display the answer
+            answerTextElement.textContent = answer;
+
+            // Update answer box styling
+            // Remove previous color classes before adding new ones to avoid conflicts
+            answerBoxElement.classList.remove('bg-green-500', 'bg-red-500', 'bg-gray-200'); // Remove potential initial gray as well
+            answerTextElement.classList.remove('text-white', 'text-gray-800'); // Remove potential initial gray text color
+
+            answerBoxElement.classList.add(answerBoxBgColor);
+            answerTextElement.classList.add(answerTextColor);
+
+             // Ensure the answer box is visible and correctly styled after clicking
+             answerBoxElement.classList.add('p-6'); // Add padding just in case it was removed
+             answerBoxElement.classList.add('rounded-lg'); // Add rounding just in case it was removed
+             answerBoxElement.classList.add('flex', 'justify-center', 'items-center'); // Ensure centering
+
+        }
+
+        // Add an event listener to the button
+        // When the button is clicked, call the checkMastersStatus function
+        if (checkButton) {
+            checkButton.addEventListener('click', checkMastersStatus);
+        } else {
+            console.error("Button with ID 'checkButton' not found.");
+        }
+
+        // Update the progress bar when the page loads
+        document.addEventListener('DOMContentLoaded', updateProgressBar);
+
+        // Optional: Update the progress bar every minute (or another interval)
+        // to keep it relatively current without needing a page refresh.
+        // setInterval(updateProgressBar, 60000); // Update every 60 seconds (60000 milliseconds)
+
+         // Set initial state for the answer box (optional, but good practice)
+         // Initially, it shows a "?" with a neutral background.
+         answerBoxElement.classList.add('bg-gray-200');
+         answerTextElement.classList.add('text-gray-800');
+         answerTextElement.textContent = "?";
+
+
+    </script>
+
+</body>
+</html>
